@@ -1,15 +1,18 @@
 import pickle
+import os
 import numpy as np
 from datetime import datetime
 
 # Original model removed from runtime to keep repo lightweight.
 # We proxy predict_fraud to the augmented model below for compatibility.
 
+_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Load augmented model and encoder
-with open("fraud_model_augmented.pkl", "rb") as f:
+with open(os.path.join(_DIR, "fraud_model_augmented.pkl"), "rb") as f:
     model_augmented = pickle.load(f)
 
-with open("card_type_encoder.pkl", "rb") as f:
+with open(os.path.join(_DIR, "card_type_encoder.pkl"), "rb") as f:
     card_type_encoder = pickle.load(f)
 
 def predict_fraud(data):
