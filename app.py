@@ -30,7 +30,10 @@ def get_db():
     uri = os.environ.get("MONGODB_URI", "mongodb://localhost:27017/safepay")
     if _mongo_client is None:
         _mongo_client = MongoClient(uri, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
-    db = _mongo_client.get_default_database()
+    try:
+        db = _mongo_client.get_default_database()
+    except Exception:
+        db = None
     if db is None:
         db = _mongo_client["safepay"]
 
