@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import os
+import traceback
 from pymongo import MongoClient, ReturnDocument
 from encryption import encrypt_data, decrypt_data
 from hashing import generate_hash, verify_password, hash_password
@@ -10,17 +11,28 @@ from searchable_encryption import token_for
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "safepay_secret"
+app.secret_key = os.environ.get("SECRET_KEY", "safepay_secret")
+
+# Show actual errors instead of generic 500 (useful for debugging on Vercel)
+@app.errorhandler(Exception)
+def handle_exception(e):
+    tb = traceback.format_exc()
+    return f"<pre>Error: {e}\n\n{tb}</pre>", 500
 
 # Paillier homomorphic instance (used for additive homomorphic operations)
 paillier = get_paillier()
 
+# Reuse MongoClient across requests in the same serverless instance
+_mongo_client = None
+
 def get_db():
+    global _mongo_client
     uri = os.environ.get("MONGODB_URI", "mongodb://localhost:27017/safepay")
-    client = MongoClient(uri)
-    db = client.get_default_database()
+    if _mongo_client is None:
+        _mongo_client = MongoClient(uri, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
+    db = _mongo_client.get_default_database()
     if db is None:
-        db = client["safepay"]
+        db = _mongo_client["safepay"]
 
     return db
 
