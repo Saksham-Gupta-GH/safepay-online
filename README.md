@@ -1,225 +1,113 @@
 # SafePay - Secure Payment System
 
-**Live Demo (Deployed App):**  https://safepay-7cyg.onrender.com/
+A secure, Flask-based online payment system with advanced cryptography, fraud detection, and role-based access control.
 
-A Flask-based secure payment system with fraud detection, encryption, and digital signatures.
+**Live Demo (Deployed App on Vercel):** https://safepay-online.vercel.app/
+*(Note: If the exact URL differs, check your Vercel dashboard.)*
 
-## Prerequisites
+## Overview
 
-- Python 3.8 or higher
-- MongoDB Atlas (cloud) OR MongoDB (local installation)
-
-## Installation & Setup
-
-### 1. Choose Your Database Option
-
-#### Option A: MongoDB Atlas (Cloud - Recommended) ☁️
-
-**No local installation required!** Follow the detailed guide:
-📖 **[MONGODB_ATLAS_SETUP.md](MONGODB_ATLAS_SETUP.md)** - Complete step-by-step instructions
-
-Quick summary:
-1. Create free account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register)
-2. Create a free M0 cluster
-3. Get your connection string
-4. Set environment variable and run
-
-#### Option B: Local MongoDB Installation
-
-**macOS:**
-```bash
-brew tap mongodb/brew
-brew install mongodb-community
-brew services start mongodb-community
-```
-
-**Linux:**
-```bash
-sudo apt-get install mongodb
-sudo systemctl start mongodb
-```
-
-**Windows:**
-Download and install from [MongoDB Download Center](https://www.mongodb.com/try/download/community)
-
-### 2. Install Python Dependencies
-
-```bash
-cd /Users/jawaharlal/Safepay2
-pip install -r requirements.txt
-```
-
-Or install with pip3:
-```bash
-pip3 install -r requirements.txt
-```
-
-### 3. Set Up MongoDB Connection (Optional)
-
-By default, the app connects to `mongodb://localhost:27017/safepay`.
-
-To use a different MongoDB instance, set the environment variable:
-```bash
-export MONGODB_URI="mongodb://your-mongodb-uri/safepay"
-```
-
-## Running the Application
-
-### Quick Start (MongoDB Atlas)
-
-**Using the helper script (easiest):**
-```bash
-cd /Users/jawaharlal/Safepay2
-
-# Set your MongoDB Atlas connection string
-export MONGODB_URI="mongodb+srv://username:password@cluster.mongodb.net/safepay?retryWrites=true&w=majority"
-
-# Run the helper script (initializes DB and starts app)
-./run.sh
-```
-
-**Manual method:**
-```bash
-cd /Users/jawaharlal/Safepay2
-
-# Set your connection string
-export MONGODB_URI="mongodb+srv://username:password@cluster.mongodb.net/safepay?retryWrites=true&w=majority"
-
-# Initialize database
-python3 db.py
-
-# Run the app
-python3 app.py
-```
-
-### Quick Start (Local MongoDB)
-
-```bash
-cd /Users/jawaharlal/Safepay2
-python3 db.py  # Initialize database
-python3 app.py  # Run the app
-```
-
-The application will start on **http://127.0.0.1:5000**
-
-### Access the Application
-
-Open your browser and navigate to:
-```
-http://127.0.0.1:5000
-```
+SafePay simulates a banking application with a focus on security and machine learning. 
+- **User Roles:** Distinct `admin` and `user` functionalities.
+- **Transactions:** Users can securely transfer funds.
+- **Cryptography:** Transaction data is AES-encrypted, digitally signed (RSA), and uses Searchable Encryption and Paillier Homomorphic Encryption for secure balance/amount storage.
+- **Fraud Detection:** Transactions are evaluated by an augmented machine learning model (`scikit-learn`) based on age, amount, balance, card type, and expiry date.
 
 ## Default Accounts
 
-After running `python3 db.py`, these accounts are created:
+To explore the application out of the box, use these pre-configured accounts (populated when the database is initialized):
 
 ### Admin Account
-- **Username:** admin
-- **Password:** admin
-- **Role:** admin
-- **Balance:** ₹50,000
+- **Username:** `admin`
+- **Password:** `admin`
+- **Role:** Admin
+- **Features:** View all users, reverse (undo) transactions, view global transaction logs.
 
 ### Test User Accounts
-- **Username:** user1
-- **Password:** 1234
-- **Role:** user
+- **Username:** `user1`
+- **Password:** `1234`
+- **Role:** User
 - **Balance:** ₹50,000
 
-- **Username:** saksham
-- **Password:** hello123
-- **Role:** user
+- **Username:** `saksham`
+- **Password:** `hello123`
+- **Role:** User
 - **Balance:** ₹50,000
 
-*Note: You can create new user accounts via the signup page*
+*Note: You can also create new user accounts via the Signup page.*
+
+## Tech Stack
+
+- **Backend:** Python, Flask
+- **Database:** MongoDB (pymongo)
+- **Machine Learning:** scikit-learn, numpy, pandas
+- **Cryptography:** cryptography (AES, RSA), custom Paillier and Searchable Encryption implementations
+- **Deployment:** Vercel (Serverless Functions)
+
+## How to Use Locally
+
+### Prerequisites
+- Python 3.11+
+- MongoDB instance (local or Atlas)
+
+### Setup Instructions
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Saksham-Gupta-GH/safepay-online.git
+   cd safepay-online
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configure Environment Variables:**
+   Copy `.env.example` to `.env` (or set them directly):
+   ```bash
+   export MONGODB_URI="mongodb://localhost:27017/safepay" 
+   # Or your MongoDB Atlas connection string
+   ```
+
+4. **Initialize the Database:**
+   This creates the required indexes and seeds the default accounts.
+   ```bash
+   python db.py
+   ```
+
+5. **Run the Application:**
+   ```bash
+   python app.py
+   ```
+   Open your browser and navigate to `http://127.0.0.1:5000`
+
+## Vercel Deployment
+
+The project is fully configured for deployment on Vercel as a Serverless Python application.
+
+1. Import the repository on Vercel.
+2. In the Vercel project settings, set the following Environment Variables:
+   - `MONGODB_URI`: Your MongoDB connection string.
+   - `AES_KEY_B64`: Base64 encoded AES key.
+   - `SEARCH_KEY_B64`: Base64 encoded Search key.
+   - `PAILLIER_PUB_JSON`: JSON payload of the Paillier public key.
+   - `PAILLIER_PRIV_JSON`: JSON payload of the Paillier private key.
+3. Deploy! Vercel handles the routing via `vercel.json` and `app.py`.
+
+*Note: Ensure your MongoDB Atlas cluster has network access allowed from `0.0.0.0/0` so Vercel's dynamic IP addresses can connect.*
 
 ## Project Structure
 
-```
-Safepay2/
-├── app.py                  # Main Flask application
-├── db.py                   # Database utilities
-├── encryption.py           # Data encryption functions
-├── hashing.py             # Password hashing utilities
-├── digital_signature.py   # Digital signature functions
-├── model_predict.py       # Fraud detection model
-├── model_train_augmented.py # Enhanced model training script with additional features
-├── requirements.txt       # Python dependencies
-├── fraud_model.pkl        # Pre-trained fraud detection model
-├── database.db            # SQLite database (if used)
-├── aes_key.bin           # Encryption key
-├── templates/            # HTML templates
-└── static/              # CSS, JS, images
+- `app.py` - Core Flask application and routing.
+- `db.py` - Database initialization and seeding script.
+- `encryption.py` - AES encryption utilities.
+- `hashing.py` - Password hashing and verification.
+- `homomorphic.py` - Paillier homomorphic encryption implementation.
+- `searchable_encryption.py` - Deterministic token generation for searchable encrypted fields.
+- `digital_signature.py` - RSA signature generation and verification.
+- `model_predict.py` - Fraud prediction logic loading the pre-trained `fraud_model_augmented.pkl`.
+- `vercel.json` - Vercel deployment configuration.
 
-```
-
-## Features
-
-- **User Authentication:** Secure login/signup with password hashing
-- **Role-Based Access:** Admin and user roles with different dashboards
-- **Secure Transactions:** Encrypted transaction data with digital signatures
-- **Fraud Detection:** ML-based fraud detection for transactions
-- **Balance Management:** Real-time balance updates with concurrency control
-- **Transaction History:** View all past transactions
-
-## Troubleshooting
-
-### MongoDB Connection Error
-```
-Error: Connection refused to MongoDB
-```
-**Solution:** Make sure MongoDB is running:
-```bash
-# macOS
-brew services start mongodb-community
-
-# Linux
-sudo systemctl start mongodb
-```
-
-### Module Not Found Error
-```
-ModuleNotFoundError: No module named 'flask'
-```
-**Solution:** Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-### Port Already in Use
-```
-OSError: [Errno 48] Address already in use
-```
-**Solution:** Kill the process using port 5000 or run on a different port:
-```bash
-# Kill process on port 5000
-lsof -ti:5000 | xargs kill -9
-
-# Or run on different port
-flask run --port 5001
-```
-
-## Development Mode
-
-The app runs in debug mode by default (see `app.py` line 190). For production:
-
-1. Set `debug=False` in `app.py`
-2. Use a production WSGI server like Gunicorn:
-```bash
-pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 app:app
-```
-
-## Security Notes
-
-- Change the `app.secret_key` in production (currently set to "safepay_secret")
-- Store sensitive keys in environment variables
-- Use HTTPS in production
-- Regularly update dependencies for security patches
-
-## Additional Documentation
-
-- **`MONGODB_ATLAS_SETUP.md`** - Complete MongoDB Atlas cloud setup guide
-- `DESIGN_SYSTEM.md` - UI/UX design guidelines
-- `TESTING_GUIDE.md` - Testing procedures
-- `CHANGES_SUMMARY.md` - Recent changes and updates
-- `VISUAL_SHOWCASE.md` - Visual documentation
+## License
+MIT License
